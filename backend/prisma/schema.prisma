@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model OrganizationInformation {
+  id                       String   @id @default(uuid())
+
+  organizationName         String?
+  organizationDescription  String?  @db.Text
+  organizationType         String?
+  organizationSize         String?
+  businessAddress          String?
+  website                  String?
+  logoUrl                  String?
+
+  // Reverse relationship
+  organizer                Organizer?
+
+  @@map("organization_information")
+}
+
+model Organizer {
+  id           String   @id @default(uuid())
+
+  // Personal Information
+  fullName     String
+  email        String   @unique
+  phoneNumber  String   @unique
+  passwordHash String
+
+  // Organization Relationship
+  organizationInfoId String @unique
+
+  organizationInfo OrganizationInformation @relation(
+    fields: [organizationInfoId],
+    references: [id]
+  )
+
+  // Account Information
+  isActive        Boolean  @default(true)
+  isEmailVerified Boolean  @default(false)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("organizers")
+}
